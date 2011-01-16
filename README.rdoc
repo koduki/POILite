@@ -3,6 +3,7 @@
 == DESCRIPTION:
 
 POI Lite is very simple Apache POI Wrapper for JRuby.
+
 This offers a simple interface to read Microsoft Excel. 
 
 == EXAMPLE
