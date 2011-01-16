@@ -7,11 +7,11 @@ POI Lite is very simple Apache POI Wrapper for JRuby.
 This offers a simple interface to read Microsoft Excel. 
 
 == EXAMPLE
-POILite::Excel::open("testcase.xls") do |book|
-  sheet1 = book.sheets[0]
-  p sheet1.cells(0, 7)
-
-  puts sheet1.used_range.map{ |row|
-    row.map{|cell| (cell != nil) ? cell.to_s : "" }.join(",") 
-  }.join("\n")
-end
+ POILite::Excel::open("testcase.xls") do |book|
+   sheet1 = book.sheets[0]
+   p sheet1.cells(0, 7)
+   
+   puts sheet1.used_range.map{ |row|
+     row.map{|cell| (cell != nil) ? cell.to_s : "" }.join(",") 
+   }.join("\n")
+ end
