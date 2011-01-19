@@ -140,8 +140,8 @@ module POILite
       begin
         block.call POILite::Excel::WorkBook.new poibook
       ensure
-        #poibook.close
-        #input.close
+        poibook.close
+        input.close
       end
     end
   end
