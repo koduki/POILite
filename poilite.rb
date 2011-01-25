@@ -137,11 +137,15 @@ module POILite
       input = FileInputStream.new filename
       poibook = WorkbookFactory.create(input)
   
-      begin
-        block.call POILite::Excel::WorkBook.new poibook
-      ensure
-        poibook.close
-        input.close
+      if &block != nil
+        begin
+          block.call POILite::Excel::WorkBook.new poibook
+        ensure
+          poibook.close
+          input.close
+        end
+      else
+        POILite::Excel::WorkBook.new poibook
       end
     end
   end
