@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'poilite.rb'
+require 'erb'
 
 filename = ARGV[0]
 
@@ -12,9 +13,10 @@ def create_testblock actions, defines
                   flatten
     target.reduce(testcases){|testcases, define| testcases.sub('%s', define) } 
   end
-
-  testblock.map{|block| block.split(/\n/)}.
-            map{|block| block.map{|testcase| testcase.split(',',3)}}
+  testblock.map{|senario| senario.split(/\n/)}.
+            flatten.
+            map{|senario| senario.split(",", 3) }.
+            map{|senario| (senario.size >= 3) ? senario : (senario << "") } 
 end
 
 def concat cells
@@ -28,9 +30,38 @@ def concat cells
   end
 end
 
-POILite::Excel::open(filename) do |book|
-  senarios = concat book.sheets[0].used_range[1..-1].map{|xs| [xs[0], xs[1]]}
-  defines = concat book.sheets[1].used_range[1..-1].map{|xs| [xs[0], xs[1]]}
+def template_case basecase, base_url, senarios
+  senarios.map do |test_senario|
+    casename = "case%03d" % test_senario[0]
+    senario = test_senario[1]
 
-p  senarios.map{|senario| create_testblock senario[1].split(/\n/), defines }  
+    erb = ERB.new(open(basecase).read)
+    [casename, erb.result(binding)] 
+  end
+end
+
+def template_suite basesuite, suite_title, testcases
+  erb = ERB.new(open(basesuite).read)
+  erb.result(binding) 
+end
+
+POILite::Excel::open(filename) do |book|
+  senarios = concat book.sheets[0].used_range[1..-1].map{|xs| [xs[0], xs[2]]}
+  defines  = concat book.sheets[1].used_range[1..-1].map{|xs| [xs[0], xs[1]]}
+  options  = Hash[*book.sheets[2].used_range.map{|xs| [xs[0], xs[1]] }.flatten]
+
+  base_url = options["Base URL"]
+  basecase = options["TestCase Template"]
+  basesuite = options["TestSuite Template"]
+  suite_title = options["Index Title"]
+  testcase_dir = options["TestCase Output Directory"]
+
+  Dir::mkdir(testcase_dir) unless File::exists? testcase_dir 
+  testcase_dir = testcase_dir.sub(/\/$/,'').sub(/$/, '/')
+  
+  testcases = template_case basecase, base_url, senarios.map{|senario| [senario[0], create_testblock(senario[1].split(/\n/), defines)]}  
+  testcases.each{|testcase| open(testcase_dir + "#{testcase[0]}.html", "w"){|f| f.puts testcase[1] }}
+
+  testsuite = template_suite basesuite, suite_title, testcases
+  open(testcase_dir + "index.html", "w"){|f| f.puts testsuite }
 end
