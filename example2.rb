@@ -30,7 +30,7 @@ def concat cells
   end
 end
 
-def template_case basecase, base_url, senarios
+def template_case basecase, base_url, ss, senarios
   senarios.map do |test_senario|
     casename = "case%03d" % test_senario[0]
     senario = test_senario[1]
@@ -55,11 +55,18 @@ POILite::Excel::open(filename) do |book|
   basesuite = options["TestSuite Template"]
   suite_title = options["Index Title"]
   testcase_dir = options["TestCase Output Directory"]
+  ss = {
+        :output_dir => options["ScreenShot Output Direcotry"],
+        :bgcolor => options["ScreenShot BG Color"],
+      }
 
-  Dir::mkdir(testcase_dir) unless File::exists? testcase_dir 
   testcase_dir = testcase_dir.sub(/\/$/,'').sub(/$/, '/')
+  Dir::mkdir(testcase_dir) unless File::exists? testcase_dir 
+
+  ss[:output_dir] = Dir::pwd + "/" + ss[:output_dir].sub(/\/$/,'').sub(/$/, '/')
+  Dir::mkdir(ss[:output_dir]) unless File::exists? ss[:output_dir]
   
-  testcases = template_case basecase, base_url, senarios.map{|senario| [senario[0], create_testblock(senario[1].split(/\n/), defines)]}  
+  testcases = template_case basecase, base_url, ss, senarios.map{|senario| [senario[0], create_testblock(senario[1].split(/\n/), defines)]}  
   testcases.each{|testcase| open(testcase_dir + "#{testcase[0]}.html", "w"){|f| f.puts testcase[1] }}
 
   testsuite = template_suite basesuite, suite_title, testcases
