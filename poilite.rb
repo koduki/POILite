@@ -1,8 +1,10 @@
 module POILite
+  libdir =  File.expand_path('../',  __FILE__)
+
   require 'java'
-  require 'jarlib/poi-3.7-20101029.jar'
-  require 'jarlib/poi-ooxml-3.7-20101029.jar'
-  require 'jarlib/poi-scratchpad-3.7-20101029.jar'
+  require libdir + '/jarlib/poi-3.7-20101029.jar'
+  require libdir + '/jarlib/poi-ooxml-3.7-20101029.jar'
+  require libdir + '/jarlib/poi-scratchpad-3.7-20101029.jar'
   
   module Excel
     include_class 'org.apache.poi.ss.usermodel.Cell'
@@ -77,17 +79,17 @@ module POILite
       end
   
       def first_cell_num 
-        @poirow.getFirstCellNum
+        (@poirow == nil) ? 0 : @poirow.getFirstCellNum
       end
       def first_cell
-        @cells[first_cell_num]
+        (@poirow == nil) ? nil : @cells[first_cell_num]
       end
   
       def last_cell_num
-        @poirow.getLastCellNum
+        (@poirow == nil) ? 0 : @poirow.getLastCellNum
       end
       def last_cell
-        @cells[last_cell_num]
+        (@poirow == nil) ? nil : @cells[last_cell_num]
       end
     end
   
@@ -97,7 +99,11 @@ module POILite
       end
   
       def [](index)
-        Util::value @poirow.getCell(index)
+        if @poirow == nil
+          ""
+        else
+          Util::value @poirow.getCell(index)
+        end
       end
     end
   
