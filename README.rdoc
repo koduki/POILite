@@ -3,10 +3,9 @@
 == DESCRIPTION:
 
 POI Lite is very simple Apache POI Wrapper for JRuby.
-
 This offers a simple interface to read Microsoft Excel. 
 
-== EXAMPLE
+== EXAMPLE:
  POILite::Excel::open("testcase.xls") do |book|
    sheet1 = book.sheets[0]
    p sheet1.cells(0, 7)
@@ -15,3 +14,8 @@ This offers a simple interface to read Microsoft Excel.
      row.map{|cell| (cell != nil) ? cell.to_s : "" }.join(",") 
    }.join("\n")
  end
+
+== PAKAGING:
+rake jar:package
+java -jar dist/poilite.jar
+
