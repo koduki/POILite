@@ -16,6 +16,6 @@ This offers a simple interface to read Microsoft Excel.
  end
 
 == PAKAGING:
-rake jar:package
-java -jar dist/poilite.jar
+ rake jar:package
+ java -jar dist/poilite.jar
 
